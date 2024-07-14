@@ -17,4 +17,4 @@ https://forestsaver.softdestept.ro
 
 ## Video de prezentare
 
-[Video]https://youtu.be/Rhkuc9pt2g8
+[Video](https://youtu.be/Rhkuc9pt2g8)
