@@ -8,7 +8,7 @@ Rețea de dispozitive inteligente menite să protejeze pădurile din toată lume
 
 ## Documentație
 
-[ForestSaver.pdf](https://github.com/user-attachments/files/16227750/ForestSaver.pdf)
+[ForestSaver.pdf]([https://github.com/user-attachments/files/16227750/ForestSaver.pdf](https://github.com/SebyR/ForestSaver/blob/main/Doc/ForestSaver.pdf))
 
 
 ## Website
