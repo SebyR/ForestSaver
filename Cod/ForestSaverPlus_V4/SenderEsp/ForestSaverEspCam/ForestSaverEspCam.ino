@@ -143,11 +143,11 @@ void setup()
     else {
         ei_printf("Camera initialized\r\n");
     }
-
-    ei_printf("\nStarting continious inference in 2 seconds...\n");
-    ei_sleep(2000);
     pinMode(4, OUTPUT);
     pinMode(12, OUTPUT);
+    ei_printf("\nStarting continious inference in 2 seconds...\n");
+    ei_sleep(2000);
+
 }
 
 /**
@@ -190,7 +190,7 @@ void loop()
         return;
     }
 
-#if EI_CLASSIFIER_OBJECT_DETECTION == 1
+    // print the predictions
     ei_printf("Object detection bounding boxes:\r\n");
     for (uint32_t i = 0; i < result.bounding_boxes_count; i++) {
         ei_impulse_result_bounding_box_t bb = result.bounding_boxes[i];
@@ -210,20 +210,19 @@ void loop()
                 bb.width,
                 bb.height);    
     }
-      if (cont > 3) {
+      if (cont >= 2) {
       ok = 10;
       cont = 0;
     }
     if (ok > 0) {
-    digitalWrite(12, HIGH);
+    digitalWrite(12, LOW);
     ok--;
    }
    else 
     {
-    digitalWrite(12, LOW);
+    digitalWrite(12, HIGH);
     }
     // Print the prediction results (classification)
-
 
     free(snapshot_buf);
 
