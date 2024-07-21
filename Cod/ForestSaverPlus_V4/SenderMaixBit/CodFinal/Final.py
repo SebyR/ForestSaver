@@ -19,7 +19,6 @@ FFT_INPUT_SIZE = (128, 128)
 FFT_LABELS = ['druj', 'back']
 MAIN_LABELS = ['fire', 'none']
 
-# Global variables for counters
 cont_druj = 0
 cont_foc = 0
 
@@ -31,12 +30,21 @@ rx = I2S(I2S.DEVICE_0)
 rx.channel_config(rx.CHANNEL_0, rx.RECEIVER, align_mode=I2S.STANDARD_MODE)
 rx.set_sample_rate(SAMPLE_RATE)
 
-# GPIO pin initialization for output
-fm.register(24, fm.fpioa.GPIO0)  # Pin for FOC
-gpio_foc = GPIO(GPIO.GPIO0, GPIO.OUT)
 
-fm.register(25, fm.fpioa.GPIO1)  # Pin for DRUJBA
-gpio_drujba = GPIO(GPIO.GPIO1, GPIO.OUT)
+fm.register(23, fm.fpioa.GPIOHS23)  # Pin ok
+gpio_ok = GPIO(GPIO.GPIOHS23, GPIO.IN,  GPIO.PULL_UP)
+
+fm.register(24, fm.fpioa.GPIOHS24)  # Pin FOC
+gpio_foc = GPIO(GPIO.GPIOHS24, GPIO.OUT)
+
+fm.register(25, fm.fpioa.GPIOHS25)  # Pin DRUJBA
+gpio_drujba = GPIO(GPIO.GPIOHS25, GPIO.OUT)
+
+io_led_green = 12
+fm.register(io_led_green, fm.fpioa.GPIO0)
+led_g=GPIO(GPIO.GPIO0, GPIO.OUT)
+
+led_g.value(1)
 
 # UART initialization
 def init_uart():
@@ -99,9 +107,12 @@ def fft_main(labels, model_addr, comm):
             time.sleep_ms(10)
 
         if cont_druj > 3:
-            print("DRUJBA")
-            gpio_drujba.value(1)  # Set DRUJBA GPIO pin HIGH
-            time.sleep(5)
+            led_g.value(0)
+            while gpio_ok.value() == 1:
+                print("DRUJBA")
+                gpio_drujba.value(1)  # Set DRUJBA GPIO pin HIGH
+                time.sleep(0.5)
+            led_g.value(1)
             gpio_drujba.value(0)
             cont_druj = 0
     except Exception as e:
@@ -126,7 +137,7 @@ def main(labels, model_addr, comm, sensor_window=INPUT_SIZE, lcd_rotation=0, sen
         task = kpu.load(model_addr)
         for _ in range(30):  # Run main classification 30 times
             img = sensor.snapshot()
-            img.rotation_corr(z_rotation=90.0, y_rotation= 180)
+            img.rotation_corr(z_rotation=270.0, y_rotation= 180)
             t = time.ticks_ms()
             fmap = kpu.forward(task, img)
             t = time.ticks_ms() - t
@@ -137,10 +148,13 @@ def main(labels, model_addr, comm, sensor_window=INPUT_SIZE, lcd_rotation=0, sen
             if labels[max_index] == 'fire' and pmax > 0.7:
                 cont_foc += 1
             time.sleep_ms(10)
-        if cont_foc > 10:
-            print("FOC")
-            gpio_foc.value(1)  # Set FOC GPIO pin HIGH
-            time.sleep(5)
+        if cont_foc > 5:
+            led_g.value(0)
+            while gpio_ok.value() == 1:
+                print("FOC")
+                gpio_foc.value(1)  # Set FOC GPIO pin HIGH
+                time.sleep(0.5)
+            led_g.value(1)
             gpio_foc.value(0)
             cont_foc = 0
     except Exception as e:

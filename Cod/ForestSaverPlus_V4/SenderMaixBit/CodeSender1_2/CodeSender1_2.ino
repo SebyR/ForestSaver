@@ -10,6 +10,7 @@ int ID = 3;
 
 int drujPin = 33;
 int focPin = 32;
+int okPin = 25;
 
 int valFoc,valDruj;
 
@@ -45,8 +46,6 @@ void setup()
         while (1);
     }
 
-  //Get device parameters - We only have to do this once
-  int status;
 
   if (!htu.begin()) {
     Serial.println("Couldn't find sensor!");
@@ -55,7 +54,7 @@ void setup()
 
   pinMode(drujPin, INPUT);
   pinMode(focPin, INPUT);
-  
+  pinMode(okPin, OUTPUT);
 }
 
 void loop()
@@ -70,18 +69,22 @@ void loop()
     umid = htu.readHumidity();
     if (valDruj == 1) {
       druj = "AD! ";
+      digitalWrite(okPin, 0);
     }
     if (umid < 30) {
       risc = "R:" + String(umid, 2) + "* ";
+
     }
     if (valFoc == 1)  {
       foc = "AF:Departe& ";
+      digitalWrite(okPin, 0);
     }
       if (temp >= 50 ) {
         foc = "AF:" + String(temp, 2) + "& ";
       }
     delay(200);
   }
+  digitalWrite(okPin, 1);
   SendData();
 }
 
