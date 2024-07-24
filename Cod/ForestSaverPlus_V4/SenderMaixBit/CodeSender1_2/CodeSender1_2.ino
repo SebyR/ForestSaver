@@ -7,6 +7,7 @@
 
 int ID = 3;
 
+bool ok = false;
 
 int drujPin = 33;
 int focPin = 32;
@@ -61,8 +62,8 @@ void loop()
 {
   foc = ""; risc = ""; druj = "";
   valFoc =0; valDruj=0;
-  for(int i = 1; i <= 60; i++){
-    baterie = PMU->getBattVoltage()/1000;
+  for(int i = 1; i <= 60 && ok == false; i++){
+    baterie = PMU->getBattVoltage()/1000.00;
     valFoc = digitalRead(focPin);
     valDruj = digitalRead(drujPin);
     temp = htu.readTemperature();
@@ -70,21 +71,24 @@ void loop()
     if (valDruj == 1) {
       druj = "AD! ";
       digitalWrite(okPin, 0);
+      ok= true;
     }
     if (umid < 30) {
       risc = "R:" + String(umid, 2) + "* ";
-
     }
     if (valFoc == 1)  {
       foc = "AF:Departe& ";
       digitalWrite(okPin, 0);
+      ok= true;
     }
       if (temp >= 50 ) {
         foc = "AF:" + String(temp, 2) + "& ";
+        ok= true;
       }
     delay(200);
   }
   digitalWrite(okPin, 1);
+  ok = false;
   SendData();
 }
 

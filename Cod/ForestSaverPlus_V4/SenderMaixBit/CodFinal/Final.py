@@ -4,6 +4,7 @@ import gc, sys
 from machine import UART
 from fpioa_manager import fm
 from Maix import I2S, FFT, GPIO
+import gc
 
 # Configuration parameters
 SAMPLE_RATE = 11025
@@ -116,10 +117,13 @@ def fft_main(labels, model_addr, comm):
             gpio_drujba.value(0)
             cont_druj = 0
     except Exception as e:
-        print("Error in fft_main: {e}")
+        print("Error in fft_main:")
+        print(e)
     finally:
         if task:
             kpu.deinit(task)
+            del task
+            gc.collect()
 
 # Main function for image classification
 def main(labels, model_addr, comm, sensor_window=INPUT_SIZE, lcd_rotation=0, sensor_hmirror=False, sensor_vflip=False):
@@ -158,10 +162,13 @@ def main(labels, model_addr, comm, sensor_window=INPUT_SIZE, lcd_rotation=0, sen
             gpio_foc.value(0)
             cont_foc = 0
     except Exception as e:
-        print("Error in main: {e}")
+        print("Error in main:")
+        print(e)
     finally:
         if task:
             kpu.deinit(task)
+            del task
+            gc.collect()
 
 # Entry point
 if __name__ == "__main__":
